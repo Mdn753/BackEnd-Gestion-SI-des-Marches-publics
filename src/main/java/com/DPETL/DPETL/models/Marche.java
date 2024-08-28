@@ -40,7 +40,7 @@ public class Marche {
     @JsonBackReference
     private AppelOffres appelOffres;
     @OneToMany(
-            mappedBy = "appelOffres",
+            mappedBy = "marche",
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL
 
