@@ -4,9 +4,11 @@ package com.DPETL.DPETL.service.interfac;
 import com.DPETL.DPETL.DTO.Response;
 import com.DPETL.DPETL.models.AppelOffres;
 import com.DPETL.DPETL.models.Marche;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+
 
 public interface IMarcheService {
     Response GetAllMarches();

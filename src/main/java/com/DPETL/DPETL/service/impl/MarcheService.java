@@ -16,11 +16,14 @@ import com.DPETL.DPETL.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+@Service
 public class MarcheService implements IMarcheService {
 
     @Autowired

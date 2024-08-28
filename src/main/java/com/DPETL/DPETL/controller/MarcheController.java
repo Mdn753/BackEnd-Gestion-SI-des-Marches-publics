@@ -47,7 +47,6 @@ public class MarcheController {
     }
 
     @GetMapping("/marche")
-    @PreAuthorize("hasAuthority('Commission')")
     public ResponseEntity<Response> GetAllMarche() {
         Response response = marcheService.GetAllMarches();
         return ResponseEntity.status(response.getStatusCode()).body(response);
