@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/marche")
 public class MarcheController {
 
     @Autowired
@@ -25,7 +24,7 @@ public class MarcheController {
     private ObjectMapper objectMapper; // Inject the preconfigured ObjectMapper
 
     @PostMapping("/marche")
-    @PreAuthorize("hasAuthority('Gestionnaire')")
+    @PreAuthorize("hasAuthority('Commission')")
     public ResponseEntity<Response> AddMarche(
             @RequestParam(value = "files", required = false) List<MultipartFile> files,
             @RequestParam("marche") String marcheJson
@@ -39,7 +38,7 @@ public class MarcheController {
     }
 
     @DeleteMapping("/marche/{id}")
-    @PreAuthorize("hasAuthority('Gestionnaire')")
+    @PreAuthorize("hasAuthority('Commission')")
     public ResponseEntity<Response> DeleteMarche(
             @PathVariable Integer id
     ) {
@@ -48,7 +47,7 @@ public class MarcheController {
     }
 
     @GetMapping("/marche")
-    @PreAuthorize("hasAuthority('Gestionnaire')")
+    @PreAuthorize("hasAuthority('Commission')")
     public ResponseEntity<Response> GetAllMarche() {
         Response response = marcheService.GetAllMarches();
         return ResponseEntity.status(response.getStatusCode()).body(response);
@@ -56,7 +55,7 @@ public class MarcheController {
 
 
     @PutMapping("/marche/{id}")
-    @PreAuthorize("hasAuthority('Gestionnaire')")
+    @PreAuthorize("hasAuthority('Commission')")
     public ResponseEntity<Response> UpdateMarche(
             @PathVariable Integer id,
             @RequestParam("marche") String marcheJson,
@@ -71,7 +70,7 @@ public class MarcheController {
     }
 
     @DeleteMapping("/marche/document")
-    @PreAuthorize("hasAuthority('Gestionnaire')")
+    @PreAuthorize("hasAuthority('Commission')")
     public ResponseEntity<Response> DeleteMarcheDocument(
             @RequestParam String path
     ) {
