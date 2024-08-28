@@ -21,6 +21,7 @@ public class AwsS3Service {
 
     private final String bucketAppelOffresDocuments = "appeloffresdocuments";
     private final String bucketOffresDocuments = "offresdocuments";
+    private final String bucketMarchesDocuments = "marchesDocuments";
 
     @Value("${aws.s3.access.key}")
     private String awsS3AccessKey;
@@ -55,8 +56,36 @@ public class AwsS3Service {
             e.printStackTrace();
             throw new OurException("Unable to upload file to s3 bucket" + e.getMessage());
         }
-
     }
+
+    public String saveMarcheDocumentsToS3(MultipartFile file) {
+        String s3LocationFile = null;
+
+        try {
+            String s3Filename = file.getOriginalFilename();
+
+            BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsS3AccessKey, awsS3SecretKey);
+            AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+                    .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                    .withRegion(Regions.EU_NORTH_1)
+                    .build();
+
+            InputStream inputStream = file.getInputStream();
+
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(file.getContentType()); // Dynamically set content type based on file
+            metadata.setContentLength(file.getSize()); // Ensure Content-Length is set
+
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketMarchesDocuments, s3Filename, inputStream, metadata);
+            s3Client.putObject(putObjectRequest);
+            return "https://" + bucketMarchesDocuments + ".s3.amazonaws.com/" + s3Filename;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new OurException("Unable to upload file to s3 bucket: " + e.getMessage());
+        }
+    }
+
 
     public String saveOffresDocumentsToS3(MultipartFile file) {
         String s3LocationFile = null;
@@ -105,6 +134,26 @@ public class AwsS3Service {
             throw new OurException("Unable to delete file from S3 bucket: " + e.getMessage());
         }
     }
+
+    public void deleteMarcheDocumentsFromS3Bucket(String fileUrl) {
+        try {
+            BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsS3AccessKey, awsS3SecretKey);
+            AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+                    .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                    .withRegion(Regions.EU_NORTH_1)
+                    .build();
+
+            // Extract the file key from the file URL
+            String fileKey = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+
+            // Delete the object from the Marche S3 bucket
+            s3Client.deleteObject(new DeleteObjectRequest(bucketMarchesDocuments, fileKey));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new OurException("Unable to delete file from S3 bucket: " + e.getMessage());
+        }
+    }
+
 
     public void deleteOffresDocumentsFromS3Bucket(String fileUrl) {
         try {
