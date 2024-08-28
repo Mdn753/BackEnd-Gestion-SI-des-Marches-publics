@@ -154,6 +154,34 @@ public class Utils {
         return appelOffresDTO;
     }
 
+    public static MarcheDTO toMarcheDTO(Marche marche) {
+        MarcheDTO marcheDTO = new MarcheDTO();
+        marcheDTO.setId(marche.getId());
+        marcheDTO.setAnnee(marche.getAnnee());
+        marcheDTO.setObjet(marche.getObjet());
+        marcheDTO.setReference(marche.getReference());
+        marcheDTO.setMontant(marche.getMontant());
+        marcheDTO.setDateSignature(marche.getDateSignature());
+        marcheDTO.setPrestataire(marche.getPrestataire());
+        marcheDTO.setEtat(marche.getEtat());
+
+        // Convert AppelOffres to AppelOffresDTO if it exists
+        if (marche.getAppelOffres() != null) {
+            marcheDTO.setAppelOffresDTO(toAppelOffresDTO(marche.getAppelOffres()));
+        }
+
+        // Convert MarcheDocuments to MarcheDocumentsDTOs if they exist
+        if (marche.getMarcheDocuments() != null && !marche.getMarcheDocuments().isEmpty()) {
+            marcheDTO.setMarcheDocumentsDTOS(marche.getMarcheDocuments().stream()
+                    .map(Utils::toMarcheDocumentsDTOWithoutMarche)
+                    .collect(Collectors.toList()));
+        } else {
+            marcheDTO.setMarcheDocumentsDTOS(Collections.emptyList()); // Ensure it's not null
+        }
+
+        return marcheDTO;
+    }
+
 
     public static OffresDTO toOffresDTO(Offres offres) {
         OffresDTO offresDTO = new OffresDTO();
@@ -245,6 +273,16 @@ public class Utils {
         return appelOffresDocumentsDTO;
     }
 
+    public static MarcheDocumentsDTO toMarcheDocumentsDTO(MarcheDocuments marcheDocuments){
+        MarcheDocumentsDTO marcheDocumentsDTO = new MarcheDocumentsDTO();
+        marcheDocumentsDTO.setId(marcheDocuments.getId());
+        marcheDocumentsDTO.setNom(marcheDocuments.getNom());
+        marcheDocumentsDTO.setPath(marcheDocuments.getPath());
+        marcheDocumentsDTO.setMarcheDTO(toMarcheDTO((marcheDocuments.getMarche())));
+
+        return marcheDocumentsDTO;
+    }
+
     public static OffresDocumentsDTO toOffresDocumentsDTO(OffresDocuments offresDocuments){
         OffresDocumentsDTO offresDocumentsDTO = new OffresDocumentsDTO();
         offresDocumentsDTO.setId(offresDocuments.getId());
@@ -283,8 +321,16 @@ public class Utils {
         return appelOffresDocumentsList.stream().map(Utils::toAppelOffresDocumentsDTO).collect(Collectors.toList());
     }
 
+    public static List<MarcheDocumentsDTO> toListMarcheDocumentsDTO(List<MarcheDocuments> marcheDocumentsList){
+        return marcheDocumentsList.stream().map(Utils::toMarcheDocumentsDTO).collect(Collectors.toList());
+    }
+
     public static List<AppelOffresDTO> toListAppelOffresDTO(List<AppelOffres> appelOffresList){
         return appelOffresList.stream().map(Utils::toAppelOffresDTO).collect(Collectors.toList());
+    }
+
+    public static List<MarcheDTO> toListMarcheDTO(List<Marche> marcheList){
+        return marcheList.stream().map(Utils::toMarcheDTO).collect(Collectors.toList());
     }
 
     public static List<OffresDTO> toListOffresDTO(List<Offres> offresList){
@@ -314,6 +360,19 @@ public class Utils {
         }
 
         AppelOffresDocumentsDTO dto = new AppelOffresDocumentsDTO();
+        dto.setId(documents.getId());
+        dto.setNom(documents.getNom());
+        dto.setPath(documents.getPath());
+
+        // Avoid setting properties that could cause recursion
+        return dto;
+    }
+
+    public static MarcheDocumentsDTO toMarcheDocumentsDTOWithoutMarche(MarcheDocuments documents){
+        if (documents == null) {
+            return null;
+        }
+        MarcheDocumentsDTO dto = new MarcheDocumentsDTO();
         dto.setId(documents.getId());
         dto.setNom(documents.getNom());
         dto.setPath(documents.getPath());
