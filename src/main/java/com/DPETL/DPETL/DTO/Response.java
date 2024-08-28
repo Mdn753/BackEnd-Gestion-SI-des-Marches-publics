@@ -26,16 +26,20 @@ public class Response {
     private List<CommissionDTO> commissionDTOS;
 
     private AppelOffresDTO appelOffresDTO;
+    private MarcheDTO marcheDTO;
     private OffresDTO offresDTO;
     private EvaluationDTO evaluationDTO;
 
     private List<AppelOffresDTO> appelOffresDTOS;
+    private List<MarcheDTO> marcheDTOS;
     private List<OffresDTO> offresDTOS;
     private List<EvaluationDTO> evaluationDTOS;
 
     private AppelOffresDocumentsDTO appelOffresDocumentsDTO;
+    private MarcheDocumentsDTO marcheDocumentsDTO;
     private OffresDocumentsDTO offresDocumentsDTO;
 
     private List<AppelOffresDocumentsDTO> appelOffresDocumentsDTOS;
+    private List<MarcheDocumentsDTO> marcheDocumentsDTOS;
     private List<OffresDocumentsDTO> offresDocumentsDTOS;
 }
