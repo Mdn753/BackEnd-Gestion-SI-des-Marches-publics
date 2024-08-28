@@ -3,14 +3,8 @@ package com.DPETL.DPETL.service.impl;
 import com.DPETL.DPETL.DTO.OffresDTO;
 import com.DPETL.DPETL.DTO.Response;
 import com.DPETL.DPETL.exception.OurException;
-import com.DPETL.DPETL.models.AppelOffres;
-import com.DPETL.DPETL.models.Commission;
-import com.DPETL.DPETL.models.Evaluation;
-import com.DPETL.DPETL.models.Offres;
-import com.DPETL.DPETL.repositories.AppelOffresRepository;
-import com.DPETL.DPETL.repositories.CommissionRepository;
-import com.DPETL.DPETL.repositories.EvaluationRepository;
-import com.DPETL.DPETL.repositories.OffresRepository;
+import com.DPETL.DPETL.models.*;
+import com.DPETL.DPETL.repositories.*;
 import com.DPETL.DPETL.service.interfac.IEvaluationService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +29,8 @@ public class EvaluationService implements IEvaluationService {
      private CommissionRepository commissionRepository;
      @Autowired
      private AppelOffresRepository appelOffresRepository;
+     @Autowired
+     private MarcheRepository marcheRepository;
 
 
     @Override
@@ -66,6 +63,22 @@ public class EvaluationService implements IEvaluationService {
                 appelOffres.setBeneficiaire(offre.getConcurrent());
                 appelOffres.setEtat("Validee");
                 appelOffresRepository.save(appelOffres);
+
+                // Create a new Marche associated with the winning AppelOffres
+                Marche marche = new Marche();
+                marche.setAnnee(appelOffres.getAnnee()); // Set appropriate year
+                marche.setReference(appelOffres.getReference()); // Set appropriate reference
+                marche.setObjet(appelOffres.getObjet()); // Set appropriate object
+                marche.setMontant(appelOffres.getMontant()); // Set appropriate amount
+                marche.setDateSignature(LocalDate.now()); // Set current date as signature date
+                marche.setPrestataire(offre.getConcurrent()); // Set winning concurrent as prestataire
+                marche.setEtat("Engagement Confirme"); // Set appropriate state
+
+                // Associate the Marche with the AppelOffres
+                marche.setAppelOffres(appelOffres);
+
+                // Save the Marche entity
+                marcheRepository.save(marche);
             }
 
             // Handle the current offre evaluation
@@ -98,6 +111,7 @@ public class EvaluationService implements IEvaluationService {
 
         return response;
     }
+
 
     @Override
     public Response GetWinningOffre(Integer offreId) {

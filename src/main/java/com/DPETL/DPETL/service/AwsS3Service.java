@@ -21,7 +21,7 @@ public class AwsS3Service {
 
     private final String bucketAppelOffresDocuments = "appeloffresdocuments";
     private final String bucketOffresDocuments = "offresdocuments";
-    private final String bucketMarchesDocuments = "marchesDocuments";
+    private final String bucketMarchesDocuments = "marchesdocuments";
 
     @Value("${aws.s3.access.key}")
     private String awsS3AccessKey;
