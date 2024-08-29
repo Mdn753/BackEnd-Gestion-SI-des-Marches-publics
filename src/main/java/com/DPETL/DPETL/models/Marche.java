@@ -33,7 +33,7 @@ public class Marche {
     private LocalDate dateSignature;
     private String Prestataire;
     private String Etat;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(
             name = "appelOffre_id"
     )
