@@ -29,8 +29,7 @@ public class Marche {
     private String reference;
     private String objet;
     private BigInteger montant;
-    @JsonFormat(pattern = "yyyy-MM-dd") // Format for LocalDate
-    private LocalDate dateSignature;
+
     private String Prestataire;
     private String Etat;
     @OneToOne
