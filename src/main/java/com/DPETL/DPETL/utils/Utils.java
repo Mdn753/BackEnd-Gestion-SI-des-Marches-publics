@@ -161,7 +161,11 @@ public class Utils {
         marcheDTO.setObjet(marche.getObjet());
         marcheDTO.setReference(marche.getReference());
         marcheDTO.setMontant(marche.getMontant());
-        marcheDTO.setDateSignature(marche.getDateSignature());
+        marcheDTO.setServices(marche.getServices());
+        marcheDTO.setType_Marche(marche.getType_Marche());
+        marcheDTO.setMode_Financement(marche.getMode_Financement());
+        marcheDTO.setCategorie(marche.getCategorie());
+        marcheDTO.setDelai(marche.getDelai());
         marcheDTO.setPrestataire(marche.getPrestataire());
         marcheDTO.setEtat(marche.getEtat());
 
@@ -378,7 +382,6 @@ public class Utils {
         dto.setId(documents.getId());
         dto.setNom(documents.getNom());
         dto.setPath(documents.getPath());
-        dto.setEtape(documents.getEtape());
         dto.setEtape(documents.getEtape());
 
         // Avoid setting properties that could cause recursion

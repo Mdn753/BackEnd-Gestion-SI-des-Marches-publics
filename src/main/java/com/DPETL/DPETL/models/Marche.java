@@ -29,7 +29,11 @@ public class Marche {
     private String reference;
     private String objet;
     private BigInteger montant;
-
+    private String Services;
+    private String Type_Marche;
+    private String Mode_Financement;
+    private String Categorie;
+    private String Delai;
     private String Prestataire;
     private String Etat;
     @OneToOne
