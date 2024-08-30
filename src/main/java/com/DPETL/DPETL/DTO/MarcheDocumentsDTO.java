@@ -12,5 +12,6 @@ public class MarcheDocumentsDTO {
     private String nom;
     private String path;
     private String etape;
+    private String description;
     private MarcheDTO MarcheDTO;
 }
