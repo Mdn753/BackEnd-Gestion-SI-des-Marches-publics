@@ -34,6 +34,8 @@ public class Marche {
     private String Mode_Financement;
     private String Categorie;
     private String Delai;
+    private LocalDate Date_Envoi;
+    private LocalDate Date_Approbation;
     private String Prestataire;
     private String Etat;
     @OneToOne

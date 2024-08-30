@@ -166,6 +166,8 @@ public class Utils {
         marcheDTO.setMode_Financement(marche.getMode_Financement());
         marcheDTO.setCategorie(marche.getCategorie());
         marcheDTO.setDelai(marche.getDelai());
+        marcheDTO.setDate_Envoi(marche.getDate_Envoi());
+        marcheDTO.setDate_Approbation(marche.getDate_Approbation());
         marcheDTO.setPrestataire(marche.getPrestataire());
         marcheDTO.setEtat(marche.getEtat());
 
@@ -282,7 +284,6 @@ public class Utils {
         marcheDocumentsDTO.setId(marcheDocuments.getId());
         marcheDocumentsDTO.setNom(marcheDocuments.getNom());
         marcheDocumentsDTO.setPath(marcheDocuments.getPath());
-        marcheDocumentsDTO.setEtape(marcheDocuments.getEtape());
         marcheDocumentsDTO.setEtape(marcheDocuments.getEtape());
         marcheDocumentsDTO.setMarcheDTO(toMarcheDTO((marcheDocuments.getMarche())));
 

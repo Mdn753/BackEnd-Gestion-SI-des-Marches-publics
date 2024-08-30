@@ -21,6 +21,8 @@ public class MarcheDTO {
     private String Mode_Financement;
     private String Categorie;
     private String Delai;
+    private LocalDate Date_Envoi;
+    private LocalDate Date_Approbation;
     private String Prestataire;
     private String Etat;
     private AppelOffresDTO appelOffresDTO;
