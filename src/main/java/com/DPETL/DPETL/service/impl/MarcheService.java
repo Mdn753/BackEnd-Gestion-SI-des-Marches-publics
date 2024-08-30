@@ -3,16 +3,15 @@ package com.DPETL.DPETL.service.impl;
 import com.DPETL.DPETL.DTO.MarcheDTO;
 import com.DPETL.DPETL.DTO.Response;
 import com.DPETL.DPETL.exception.OurException;
+import com.DPETL.DPETL.models.AppelOffres;
 import com.DPETL.DPETL.models.Commission;
 import com.DPETL.DPETL.models.Marche;
 import com.DPETL.DPETL.models.MarcheDocuments;
-import com.DPETL.DPETL.repositories.CommissionRepository;
-import com.DPETL.DPETL.repositories.GestionnaireRepository;
-import com.DPETL.DPETL.repositories.MarcheDocumentsRepository;
-import com.DPETL.DPETL.repositories.MarcheRepository;
+import com.DPETL.DPETL.repositories.*;
 import com.DPETL.DPETL.service.AwsS3Service;
 import com.DPETL.DPETL.service.interfac.IMarcheService;
 import com.DPETL.DPETL.utils.Utils;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,6 +33,8 @@ public class MarcheService implements IMarcheService {
     private GestionnaireRepository gestionnaireRepository;
     @Autowired
     private CommissionRepository commissionRepository;
+    @Autowired
+    private AppelOffresRepository appelOffresRepository;
     @Autowired
     private AwsS3Service awsS3Service;
 
@@ -159,6 +160,7 @@ public class MarcheService implements IMarcheService {
     }
 
     @Override
+    @Transactional
     public Response DeleteMarche(Integer id) {
         Response response = new Response();
         try {
@@ -166,28 +168,52 @@ public class MarcheService implements IMarcheService {
             Marche marche = marcheRepository.findById(id)
                     .orElseThrow(() -> new OurException("Marche not found"));
 
+            // Log the retrieved Marche
+            //System.out.println("Retrieved Marche: " + marche);
+
+            // Retrieve and log the associated AppelOffres
+            AppelOffres appelOffres = marche.getAppelOffres();
+            if (appelOffres != null) {
+                //System.out.println("Associated AppelOffres before update: " + appelOffres);
+                appelOffres.setBeneficiaire(null);
+                appelOffres.setEtat(null);
+                appelOffresRepository.save(appelOffres);
+                //System.out.println("Updated AppelOffres: " + appelOffres);
+            }
+
             // Delete associated documents from S3
             for (MarcheDocuments document : marche.getMarcheDocuments()) {
                 awsS3Service.deleteMarcheDocumentsFromS3Bucket(document.getPath());
             }
 
+            // Log before deletion
+            //System.out.println("Deleting Marche with ID: " + id);
+
             // Delete the Marche entity
-            marcheRepository.deleteById(id);
+            marcheRepository.deleteMarcheById(id);
+
+            // Log after deletion
+            //System.out.println("Marche with ID: " + id + " deleted.");
 
             // Prepare the response
             response.setStatusCode(200);
             response.setMessage("Marche deleted successfully.");
+            response.setId(id);  // Include the ID of the deleted Marche
 
         } catch (OurException e) {
             response.setStatusCode(404);
             response.setMessage(e.getMessage());
+            response.setId(id);  // Include the ID for reference even if not found
         } catch (Exception e) {
             response.setStatusCode(500);
             response.setMessage("Error deleting Marche: " + e.getMessage());
+            response.setId(id);  // Include the ID even in case of an error
         }
 
         return response;
     }
+
+
 
     @Override
     public Response DeleteMarcheDocuments(String path) {

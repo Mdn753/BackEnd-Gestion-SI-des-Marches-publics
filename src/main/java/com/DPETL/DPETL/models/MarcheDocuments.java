@@ -19,6 +19,7 @@ public class MarcheDocuments {
     private Integer id;
     private String nom;
     private String path;
+    private String etape;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "marche_id"

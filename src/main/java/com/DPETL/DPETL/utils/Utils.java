@@ -278,6 +278,7 @@ public class Utils {
         marcheDocumentsDTO.setId(marcheDocuments.getId());
         marcheDocumentsDTO.setNom(marcheDocuments.getNom());
         marcheDocumentsDTO.setPath(marcheDocuments.getPath());
+        marcheDocumentsDTO.setEtape(marcheDocuments.getEtape());
         marcheDocumentsDTO.setMarcheDTO(toMarcheDTO((marcheDocuments.getMarche())));
 
         return marcheDocumentsDTO;
@@ -376,6 +377,7 @@ public class Utils {
         dto.setId(documents.getId());
         dto.setNom(documents.getNom());
         dto.setPath(documents.getPath());
+        dto.setEtape(documents.getEtape());
 
         // Avoid setting properties that could cause recursion
         return dto;
