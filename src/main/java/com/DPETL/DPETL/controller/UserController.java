@@ -2,6 +2,7 @@ package com.DPETL.DPETL.controller;
 
 
 import com.DPETL.DPETL.DTO.Response;
+import com.DPETL.DPETL.models.Admin;
 import com.DPETL.DPETL.models.Commission;
 import com.DPETL.DPETL.models.Gestionnaire;
 import com.DPETL.DPETL.service.interfac.IAppelOffresService;
@@ -19,6 +20,9 @@ public class UserController {
     private IUserService userService;
     @Autowired
     private IAppelOffresService appelOffresService;
+
+
+
 
     @PostMapping("/admin/gestionnaire")
     @PreAuthorize("hasAuthority('Admin')")
@@ -112,6 +116,15 @@ public class UserController {
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
     /////////////////////////////////////////////////////////////////////////////////////////
+
+
+    @PostMapping("/admin")
+    public ResponseEntity<Response> CreateAdmin(
+            @RequestBody Admin admin
+    ){
+        Response response = userService.CreateAdmin(admin);
+        return ResponseEntity.status(response.getStatusCode()).body(response);
+    }
 
 
 

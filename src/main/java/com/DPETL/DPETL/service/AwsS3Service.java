@@ -2,6 +2,7 @@ package com.DPETL.DPETL.service;
 
 
 import com.DPETL.DPETL.exception.OurException;
+import com.amazonaws.RequestClientOptions;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
@@ -10,11 +11,16 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
+import com.amazonaws.services.s3.transfer.Upload;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 
 @Service
 public class AwsS3Service {
@@ -34,7 +40,8 @@ public class AwsS3Service {
 
         try {
 
-            String s3Filename = file.getOriginalFilename();
+            String originalFilename = file.getOriginalFilename();
+            String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
 
             BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsS3AccessKey, awsS3SecretKey);
             AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
@@ -48,9 +55,9 @@ public class AwsS3Service {
             metadata.setContentType(file.getContentType()); // Dynamically set content type based on file
             metadata.setContentLength(file.getSize()); // Ensure Content-Length is set
 
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketAppelOffresDocuments, s3Filename, inputStream, metadata);
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketAppelOffresDocuments, uniqueFilename, inputStream, metadata);
             s3Client.putObject(putObjectRequest);
-            return "https://" + bucketAppelOffresDocuments + ".s3.amazonaws.com/" + s3Filename;
+            return "https://" + bucketAppelOffresDocuments + ".s3.amazonaws.com/" + uniqueFilename;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,7 +69,8 @@ public class AwsS3Service {
         String s3LocationFile = null;
 
         try {
-            String s3Filename = file.getOriginalFilename();
+            String originalFilename = file.getOriginalFilename();
+            String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
 
             BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsS3AccessKey, awsS3SecretKey);
             AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
@@ -76,9 +84,9 @@ public class AwsS3Service {
             metadata.setContentType(file.getContentType()); // Dynamically set content type based on file
             metadata.setContentLength(file.getSize()); // Ensure Content-Length is set
 
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketMarchesDocuments, s3Filename, inputStream, metadata);
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketMarchesDocuments, uniqueFilename, inputStream, metadata);
             s3Client.putObject(putObjectRequest);
-            return "https://" + bucketMarchesDocuments + ".s3.amazonaws.com/" + s3Filename;
+            return "https://" + bucketMarchesDocuments + ".s3.amazonaws.com/" + uniqueFilename;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,10 +97,11 @@ public class AwsS3Service {
 
     public String saveOffresDocumentsToS3(MultipartFile file) {
         String s3LocationFile = null;
+        InputStream inputStream = null;
 
         try {
-
-            String s3Filename = file.getOriginalFilename();
+            String originalFilename = file.getOriginalFilename();
+            String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
 
             BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsS3AccessKey, awsS3SecretKey);
             AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
@@ -100,21 +109,41 @@ public class AwsS3Service {
                     .withRegion(Regions.EU_NORTH_1)
                     .build();
 
-            InputStream inputStream = file.getInputStream();
+            // Create TransferManager for handling large file uploads
+            TransferManager transferManager = TransferManagerBuilder.standard()
+                    .withS3Client(s3Client)
+                    .build();
+
+            inputStream = file.getInputStream();
 
             ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType("application/pdf");
+            metadata.setContentType(file.getContentType());
+            metadata.setContentLength(file.getSize());
 
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketOffresDocuments, s3Filename, inputStream, metadata);
-            s3Client.putObject(putObjectRequest);
-            return "https://" + bucketOffresDocuments + ".s3.amazonaws.com/" + s3Filename;
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketOffresDocuments, uniqueFilename, inputStream, metadata);
+
+            // Use TransferManager to handle the upload
+            Upload upload = transferManager.upload(putObjectRequest);
+            upload.waitForCompletion();
+
+            s3LocationFile = "https://" + bucketOffresDocuments + ".s3.amazonaws.com/" + uniqueFilename;
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new OurException("Unable to upload file to s3 bucket" + e.getMessage());
+            throw new OurException("Unable to upload file to S3 bucket: " + e.getMessage());
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
+        return s3LocationFile;
     }
+
 
     public void deleteAppelOffresDocumentsFromS3Bucket(String fileUrl) {
         try {

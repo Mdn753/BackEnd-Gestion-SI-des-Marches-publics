@@ -16,7 +16,13 @@ public class MarcheDTO {
     private String reference;
     private String objet;
     private BigInteger montant;
-    private LocalDate dateSignature;
+    private String Services;
+    private String Type_Marche;
+    private String Mode_Financement;
+    private String Categorie;
+    private String Delai;
+    private LocalDate Date_Envoi;
+    private LocalDate Date_Approbation;
     private String Prestataire;
     private String Etat;
     private AppelOffresDTO appelOffresDTO;

@@ -10,6 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 public interface MarcheRepository extends JpaRepository<Marche,Integer> {
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM db_dptel.marche WHERE id = :id", nativeQuery = true)
+    @Query(value = "DELETE FROM DB_DPTEL.marche WHERE id = :id", nativeQuery = true)
     void deleteMarcheById(Integer id);
 }

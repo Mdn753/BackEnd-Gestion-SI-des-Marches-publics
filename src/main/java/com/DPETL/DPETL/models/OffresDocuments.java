@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "offres_documents", uniqueConstraints = @UniqueConstraint(columnNames = "path"))
 public class OffresDocuments {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -26,7 +27,6 @@ public class OffresDocuments {
     private String description;
 
     private String type;
-
 
     @ManyToOne()
     @JoinColumn(name = "offres_id")

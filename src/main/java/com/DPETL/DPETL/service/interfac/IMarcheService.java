@@ -1,6 +1,7 @@
 package com.DPETL.DPETL.service.interfac;
 
 
+import com.DPETL.DPETL.DTO.FileMetaData;
 import com.DPETL.DPETL.DTO.Response;
 import com.DPETL.DPETL.models.AppelOffres;
 import com.DPETL.DPETL.models.Marche;
@@ -16,4 +17,6 @@ public interface IMarcheService {
     Response UpdateMarche(Integer id, Marche marche, List<MultipartFile> files);
     Response DeleteMarche(Integer id);
     Response DeleteMarcheDocuments(String path);
+    Response GetDocumentsByEtape(Integer id , String etape);
+    Response UploadMarcheDocuments(List<FileMetaData> fileMetaData);
 }

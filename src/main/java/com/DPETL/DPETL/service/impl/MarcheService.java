@@ -1,6 +1,8 @@
 package com.DPETL.DPETL.service.impl;
 
+import com.DPETL.DPETL.DTO.FileMetaData;
 import com.DPETL.DPETL.DTO.MarcheDTO;
+import com.DPETL.DPETL.DTO.MarcheDocumentsDTO;
 import com.DPETL.DPETL.DTO.Response;
 import com.DPETL.DPETL.exception.OurException;
 import com.DPETL.DPETL.models.AppelOffres;
@@ -18,7 +20,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -113,7 +117,13 @@ public class MarcheService implements IMarcheService {
             existingMarche.setReference(marche.getReference());
             existingMarche.setObjet(marche.getObjet());
             existingMarche.setMontant(marche.getMontant());
-            existingMarche.setDateSignature(marche.getDateSignature());
+            existingMarche.setServices(marche.getServices());
+            existingMarche.setType_Marche(marche.getType_Marche());
+            existingMarche.setMode_Financement(marche.getMode_Financement());
+            existingMarche.setCategorie(marche.getCategorie());
+            existingMarche.setDelai(marche.getDelai());
+            existingMarche.setDate_Envoi(marche.getDate_Envoi());
+            existingMarche.setDate_Approbation(marche.getDate_Approbation());
             existingMarche.setPrestataire(marche.getPrestataire());
             existingMarche.setEtat(marche.getEtat());
             // Update other fields as necessary
@@ -186,6 +196,10 @@ public class MarcheService implements IMarcheService {
                 awsS3Service.deleteMarcheDocumentsFromS3Bucket(document.getPath());
             }
 
+
+            marche.getMarcheDocuments().clear();
+            marcheRepository.save(marche); // Save changes
+
             // Log before deletion
             //System.out.println("Deleting Marche with ID: " + id);
 
@@ -241,6 +255,70 @@ public class MarcheService implements IMarcheService {
 
         return response;
     }
+
+    @Override
+    public Response GetDocumentsByEtape(Integer id, String etape) {
+        Response response = new Response();
+        try {
+            List<MarcheDocuments> documents = marcheDocumentsRepository.findByMarcheIdAndEtape(id, etape);
+
+            if (documents.isEmpty()) {
+                response.setStatusCode(404);
+                response.setMessage("No documents found for the provided marche and etape.");
+            } else {
+                response.setStatusCode(200);
+                response.setMessage("Documents retrieved successfully.");
+                response.setMarcheDocumentsDTOS(Utils.toListMarcheDocumentsDTO(documents));
+            }
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setMessage("Error Getting Documents: " + e.getMessage());
+        }
+        return response;
+    }
+
+    @Override
+    public Response UploadMarcheDocuments(List<FileMetaData> fileMetaDataList) {
+        Response response = new Response();
+
+        try {
+
+            List<MarcheDocumentsDTO> marcheDocumentsDTOList = new ArrayList<>();
+            // Process each FileMetaData item
+            for (FileMetaData fileMetaData : fileMetaDataList) {
+                // Save the file to S3
+                String fileUrl = awsS3Service.saveMarcheDocumentsToS3(fileMetaData.getFile());
+
+                Marche existingMarche = marcheRepository.findById(fileMetaData.getMarcheId())
+                        .orElseThrow(() -> new OurException("Marche not found"));;
+
+                // Create a new MarcheDocumentsDTO object with the file metadata
+                MarcheDocuments marcheDocuments = new MarcheDocuments();
+                marcheDocuments.setNom(fileMetaData.getFile().getOriginalFilename());
+                marcheDocuments.setPath(fileUrl);
+                marcheDocuments.setDescription(fileMetaData.getDescription());
+                marcheDocuments.setEtape(fileMetaData.getEtape());
+                marcheDocuments.setMarche(existingMarche);
+
+                marcheDocumentsRepository.save(marcheDocuments);
+                marcheDocumentsDTOList.add(Utils.toMarcheDocumentsDTO(marcheDocuments));
+            }
+
+            response.setStatusCode(200);
+            response.setMessage("Files uploaded and metadata saved successfully");
+            response.setMarcheDocumentsDTOS(marcheDocumentsDTOList);
+
+        } catch (OurException e) {
+            response.setStatusCode(404);
+            response.setMessage(e.getMessage());
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setMessage("Error Adding Marche document: " + e.getMessage());
+        }
+
+        return response;
+    }
+
 
     private Commission getAuthenticatedCommission() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
