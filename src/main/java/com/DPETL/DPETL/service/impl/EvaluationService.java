@@ -61,7 +61,7 @@ public class EvaluationService implements IEvaluationService {
 
                 // Update AppelOffres to reflect the new winner
                 appelOffres.setBeneficiaire(offre.getConcurrent());
-                appelOffres.setEtat("Validee");
+                appelOffres.setEtat("Attribuee");
                 appelOffresRepository.save(appelOffres);
 
                 // Create a new Marche associated with the winning AppelOffres
@@ -70,9 +70,8 @@ public class EvaluationService implements IEvaluationService {
                 marche.setReference(appelOffres.getReference()); // Set appropriate reference
                 marche.setObjet(appelOffres.getObjet()); // Set appropriate object
                 marche.setMontant(appelOffres.getMontant()); // Set appropriate amount
-                marche.setDateSignature(LocalDate.now()); // Set current date as signature date
                 marche.setPrestataire(offre.getConcurrent()); // Set winning concurrent as prestataire
-                marche.setEtat("Engagement Confirme"); // Set appropriate state
+                marche.setEtat("Attribuee"); // Set appropriate state
 
                 // Associate the Marche with the AppelOffres
                 marche.setAppelOffres(appelOffres);

@@ -4,6 +4,7 @@ package com.DPETL.DPETL.models;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,11 +31,16 @@ public class Marche {
     private String objet;
     private BigInteger montant;
     private String Services;
+
+    @JsonProperty("typeMarche")
     private String Type_Marche;
+    @JsonProperty("modeFinancement")
     private String Mode_Financement;
     private String Categorie;
     private String Delai;
+    @JsonProperty("dateEnvoi")
     private LocalDate Date_Envoi;
+    @JsonProperty("dateApprobation")
     private LocalDate Date_Approbation;
     private String Prestataire;
     private String Etat;
@@ -47,8 +53,8 @@ public class Marche {
     @OneToMany(
             mappedBy = "marche",
             fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL
-
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     @JsonManagedReference
     private List<MarcheDocuments> MarcheDocuments = new ArrayList<>();

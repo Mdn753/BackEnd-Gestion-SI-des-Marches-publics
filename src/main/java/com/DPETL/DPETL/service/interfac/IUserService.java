@@ -3,6 +3,7 @@ package com.DPETL.DPETL.service.interfac;
 
 import com.DPETL.DPETL.DTO.LoginRequest;
 import com.DPETL.DPETL.DTO.Response;
+import com.DPETL.DPETL.models.Admin;
 import com.DPETL.DPETL.models.Commission;
 import com.DPETL.DPETL.models.Gestionnaire;
 
@@ -20,5 +21,5 @@ public interface IUserService {
     Response UpdateGestionnaire(Integer id, Gestionnaire gestionnaire);
     Response UpdateCommission(Integer id, Commission commission);
     Response GetAllUsers();
-
+    Response CreateAdmin(Admin admin);
 }

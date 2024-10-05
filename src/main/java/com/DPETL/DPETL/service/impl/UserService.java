@@ -1,10 +1,7 @@
 package com.DPETL.DPETL.service.impl;
 
 
-import com.DPETL.DPETL.DTO.CommissionDTO;
-import com.DPETL.DPETL.DTO.GestionnaireDTO;
-import com.DPETL.DPETL.DTO.LoginRequest;
-import com.DPETL.DPETL.DTO.Response;
+import com.DPETL.DPETL.DTO.*;
 import com.DPETL.DPETL.exception.OurException;
 import com.DPETL.DPETL.models.Admin;
 import com.DPETL.DPETL.models.Commission;
@@ -337,6 +334,33 @@ public class UserService implements IUserService {
     public Response GetAllUsers() {
 
         return null;
+    }
+
+    @Override
+    public Response CreateAdmin(Admin admin) {
+        Response response = new Response();
+        try {
+
+            admin.setRole("Admin");
+            if(adminRepository.existsByUsername(admin.getUsername())){
+                throw new OurException(admin.getUsername() + "Already Exists");
+            }
+
+            admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+            Admin savedAdmin = adminRepository.save(admin);
+            AdminDTO adminDTO = Utils.toAdminDTO(savedAdmin);
+            response.setStatusCode(200);
+            response.setAdminDTO(adminDTO);
+
+        }catch (OurException e) {
+            response.setStatusCode(400);
+            response.setMessage(e.getMessage());
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setMessage("Error Occurred During gestionnaire Registration " + e.getMessage());
+
+        }
+        return response;
     }
 
 
